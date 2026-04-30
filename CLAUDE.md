@@ -29,3 +29,13 @@ Operator validation lives in `main`: `argv[2]` must be exactly one character. Th
 - `assert_fail <name> <expected_stderr_substring> <args...>` — expects rc=1, stderr contains the substring, empty stdout.
 
 When adding behavior, add both an error case and a golden-path regression test. The `*` operator must be quoted in test args (`'*'`) to avoid shell glob expansion.
+
+# Meine persönlichen Claude-Einstellungen
+
+## Meine Rolle
+[Deine Rolle, z.B. Senior Developer, dein Schwerpunkt]
+Geh bei mir nicht von Grundlagen aus.
+
+## Kommunikation
+- Antworte immer auf Deutsch
+- Gib direkte Empfehlungen
