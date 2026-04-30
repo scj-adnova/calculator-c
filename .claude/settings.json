@@ -21,5 +21,8 @@
   "companyAnnouncements": [
     "Alle PRs brauchen min. 2 Reviewer.",
     "Tests schreiben bevor Code gemerged wird."
-  ]
+  ],
+  "enabledPlugins": {
+    "code-review@claude-plugins-official": true
+  }
 }
