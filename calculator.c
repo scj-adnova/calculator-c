@@ -17,21 +17,19 @@ enum calc_status {
     CALC_ERR_UNKNOWN_OP,
 };
 
-double calculate(double a, char op, double b, int *status) {
-    *status = CALC_OK;
+enum calc_status calculate(double a, char op, double b, double *result) {
     switch (op) {
-        case '+': return a + b;
-        case '-': return a - b;
-        case '*': return a * b;
+        case '+': *result = a + b; return CALC_OK;
+        case '-': *result = a - b; return CALC_OK;
+        case '*': *result = a * b; return CALC_OK;
         case '/':
             if (b == 0.0) {
-                *status = CALC_ERR_DIV_ZERO;
-                return 0.0;
+                return CALC_ERR_DIV_ZERO;
             }
-            return a / b;
+            *result = a / b;
+            return CALC_OK;
         default:
-            *status = CALC_ERR_UNKNOWN_OP;
-            return 0.0;
+            return CALC_ERR_UNKNOWN_OP;
     }
 }
 
@@ -88,9 +86,8 @@ int main(int argc, char *argv[]) {
     }
     char op = argv[2][0];
 
-    int status;
-    double result = calculate(a, op, b, &status);
-    switch (status) {
+    double result;
+    switch (calculate(a, op, b, &result)) {
         case CALC_OK:
             break;
         case CALC_ERR_DIV_ZERO:
