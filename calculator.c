@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <math.h>
 
 /*
  * Calculator CLI
@@ -40,30 +41,37 @@ static int parse_number(const char *s, double *out) {
     double v = strtod(s, &end);
     if (end == s || *end != '\0') return 0;
     if (errno == ERANGE) return 0;
+    if (!isfinite(v)) return 0;
     *out = v;
     return 1;
 }
 
+/*
+ * Entry point: parses three CLI arguments (number, operator, number),
+ * validates them, calls calculate(), and prints the result to stdout.
+ * On any input or computation error, prints a message to stderr and
+ * exits with status 1.
+ */
 int main(int argc, char *argv[]) {
     if (argc != 4) {
-        fprintf(stderr, "Usage: %s <number> <operator> <number>\n", argv[0]);
-        fprintf(stderr, "Example: %s 10 + 5\n", argv[0]);
+        fprintf(stderr, "Verwendung: %s <zahl> <operator> <zahl>\n", argv[0]);
+        fprintf(stderr, "Beispiel: %s 10 + 5\n", argv[0]);
         return 1;
     }
 
     double a, b;
     if (!parse_number(argv[1], &a)) {
-        fprintf(stderr, "Error: '%s' is not a valid number\n", argv[1]);
+        fprintf(stderr, "Fehler: '%s' ist keine gültige Zahl\n", argv[1]);
         return 1;
     }
     if (!parse_number(argv[3], &b)) {
-        fprintf(stderr, "Error: '%s' is not a valid number\n", argv[3]);
+        fprintf(stderr, "Fehler: '%s' ist keine gültige Zahl\n", argv[3]);
         return 1;
     }
 
     if (argv[2][0] == '\0' || argv[2][1] != '\0') {
         fprintf(stderr,
-                "Error: operator must be a single character (+, -, *, /), got '%s'\n",
+                "Fehler: Operator muss ein einzelnes Zeichen sein (+, -, *, /), erhalten: '%s'\n",
                 argv[2]);
         return 1;
     }
@@ -75,11 +83,11 @@ int main(int argc, char *argv[]) {
         case CALC_OK:
             break;
         case CALC_ERR_DIV_ZERO:
-            fprintf(stderr, "Error: division by zero\n");
+            fprintf(stderr, "Fehler: Division durch null\n");
             return 1;
         case CALC_ERR_UNKNOWN_OP:
             fprintf(stderr,
-                    "Error: unknown operator '%c' (supported: +, -, *, /)\n",
+                    "Fehler: Unbekannter Operator '%c' (unterstützt: +, -, *, /)\n",
                     op);
             return 1;
     }
