@@ -3,6 +3,7 @@
 #include <string.h>
 #include <errno.h>
 #include <math.h>
+#include <stdbool.h>
 
 /*
  * Calculator CLI
@@ -34,16 +35,26 @@ double calculate(double a, char op, double b, int *status) {
     }
 }
 
-static int parse_number(const char *s, double *out) {
-    if (s == NULL || *s == '\0') return 0;
+static bool parse_number(const char *input, double *result) {
+    if (input == NULL || *input == '\0') {
+        return false;
+    }
+
     errno = 0;
     char *end = NULL;
-    double v = strtod(s, &end);
-    if (end == s || *end != '\0') return 0;
-    if (errno == ERANGE) return 0;
-    if (!isfinite(v)) return 0;
-    *out = v;
-    return 1;
+    double value = strtod(input, &end);
+
+    bool no_digits_consumed = (end == input);
+    bool has_trailing_chars = (*end != '\0');
+    bool out_of_range       = (errno == ERANGE);
+    bool not_finite         = !isfinite(value);
+
+    if (no_digits_consumed || has_trailing_chars || out_of_range || not_finite) {
+        return false;
+    }
+
+    *result = value;
+    return true;
 }
 
 /*
