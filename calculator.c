@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <errno.h>
 #include <math.h>
 #include <stdbool.h>
@@ -15,22 +14,23 @@ enum calc_status {
     CALC_OK = 0,
     CALC_ERR_DIV_ZERO,
     CALC_ERR_UNKNOWN_OP,
+    CALC_ERR_OVERFLOW,
 };
 
-enum calc_status calculate(double a, char op, double b, double *result) {
+static enum calc_status calculate(double a, char op, double b, double *result) {
     switch (op) {
-        case '+': *result = a + b; return CALC_OK;
-        case '-': *result = a - b; return CALC_OK;
-        case '*': *result = a * b; return CALC_OK;
+        case '+': *result = a + b; break;
+        case '-': *result = a - b; break;
+        case '*': *result = a * b; break;
         case '/':
-            if (b == 0.0) {
-                return CALC_ERR_DIV_ZERO;
-            }
+            if (b == 0.0) return CALC_ERR_DIV_ZERO;
             *result = a / b;
-            return CALC_OK;
+            break;
         default:
             return CALC_ERR_UNKNOWN_OP;
     }
+    if (!isfinite(*result)) return CALC_ERR_OVERFLOW;
+    return CALC_OK;
 }
 
 static bool parse_number(const char *input, double *result) {
@@ -62,9 +62,11 @@ static bool parse_number(const char *input, double *result) {
  * exits with status 1.
  */
 int main(int argc, char *argv[]) {
+    const char *prog = (argc > 0 && argv[0]) ? argv[0] : "calculator";
+
     if (argc != 4) {
-        fprintf(stderr, "Verwendung: %s <zahl> <operator> <zahl>\n", argv[0]);
-        fprintf(stderr, "Beispiel: %s 10 + 5\n", argv[0]);
+        fprintf(stderr, "Verwendung: %s <zahl> <operator> <zahl>\n", prog);
+        fprintf(stderr, "Beispiel: %s 10 + 5\n", prog);
         return 1;
     }
 
@@ -97,6 +99,9 @@ int main(int argc, char *argv[]) {
             fprintf(stderr,
                     "Fehler: Unbekannter Operator '%c' (unterstützt: +, -, *, /)\n",
                     op);
+            return 1;
+        case CALC_ERR_OVERFLOW:
+            fprintf(stderr, "Fehler: Ergebnis ist zu groß oder ungültig\n");
             return 1;
     }
 

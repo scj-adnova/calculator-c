@@ -1,5 +1,5 @@
 CC      = gcc
-CFLAGS  = -Wall -Wextra -pedantic -std=c11
+CFLAGS  = -Wall -Wextra -pedantic -Werror -std=c11
 TARGET  = calculator
 
 .PHONY: all clean test

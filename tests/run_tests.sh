@@ -68,6 +68,7 @@ assert_fail "Unbekannter Operator"       "Unbekannter Operator"                 
 assert_fail "Falsche Argumentanzahl"     "Verwendung:"                                  10 +
 assert_fail "NaN-Eingabe abgelehnt"      "ist keine gültige Zahl"                      nan + 1
 assert_fail "Sehr große Zahl (Overflow)" "ist keine gültige Zahl"                      1e500 + 0
+assert_fail "Ergebnis-Overflow"          "Ergebnis ist zu groß"                        1e300 '*' 1e300
 
 echo
 echo "=== Golden Paths ==="
