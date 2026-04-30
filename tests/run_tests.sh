@@ -78,5 +78,40 @@ assert_ok "Multiplikation"        "10"     2.5 '*' 4
 assert_ok "Sehr große, gültige Zahl" "1e+300"  1e300 + 0
 
 echo
+echo "=== Verlauf ==="
+rm -f "$HOME/.calculator_history"
+assert_ok "Verlauf leer"            "Kein Verlauf vorhanden."   --verlauf
+"$BIN" 7 + 3 > /dev/null 2>&1
+assert_ok "Verlauf ein Eintrag"     "7 + 3 = 10"                --verlauf
+
+# 10 weitere Berechnungen durchführen (insgesamt 11), sodass der erste Eintrag
+# (7 + 3 = 10) aus dem FIFO-Puffer herausfällt
+for i in $(seq 1 10); do "$BIN" "$i" + 0 > /dev/null 2>&1; done
+
+# Verlauf auslesen und Zeilenanzahl prüfen
+TOTAL_LINES=$("$BIN" --verlauf | wc -l | tr -d ' ')
+TOTAL=$((TOTAL + 1))
+if [[ "$TOTAL_LINES" -eq 10 ]]; then
+    echo "  PASS  Verlauf genau 10 Einträge"
+    PASS=$((PASS + 1))
+else
+    echo "  FAIL  Verlauf genau 10 Einträge"
+    echo "        expected: 10 Zeilen"
+    echo "        got:      $TOTAL_LINES Zeilen"
+    FAIL=$((FAIL + 1))
+fi
+
+# Erster Eintrag (7 + 3 = 10) darf nicht mehr vorhanden sein
+TOTAL=$((TOTAL + 1))
+if ! "$BIN" --verlauf | grep -q "7 + 3 = 10"; then
+    echo "  PASS  Verlauf ältester Eintrag verdrängt"
+    PASS=$((PASS + 1))
+else
+    echo "  FAIL  Verlauf ältester Eintrag verdrängt"
+    echo "        '7 + 3 = 10' sollte nicht mehr im Verlauf stehen"
+    FAIL=$((FAIL + 1))
+fi
+
+echo
 echo "$PASS/$TOTAL passed"
 [[ $FAIL -eq 0 ]] || exit 1
