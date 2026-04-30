@@ -22,7 +22,16 @@
     "Alle PRs brauchen min. 2 Reviewer.",
     "Tests schreiben bevor Code gemerged wird."
   ],
+  "extraKnownMarketplaces": {
+    "team-marketplace": {
+      "source": {
+        "source": "directory",
+        "path": "../team-marketplace"
+      }
+    }
+  },
   "enabledPlugins": {
-    "code-review@claude-plugins-official": true
+    "code-review@claude-plugins-official": true,
+    "team-marketplace@team-marketplace": true
   }
 }
