@@ -61,12 +61,12 @@ assert_fail() {
 
 echo "=== Fehlerfälle ==="
 assert_fail "Division durch null"        "Fehler: Division durch null"                 1 / 0
-assert_fail "Nicht-numerischer Operand"  "ist keine gültige Zahl"                      abc + 5
-assert_fail "Mehrzeichen-Operator"       "Operator muss ein einzelnes Zeichen sein"    1 ++ 2
-assert_fail "Leerer Operator"            "Operator muss ein einzelnes Zeichen sein"    1 "" 2
-assert_fail "Unbekannter Operator"       "Unbekannter Operator"                         1 a 2
+assert_fail "Nicht-numerischer Operand"  "ungültige Zeichen"                           abc + 5
+assert_fail "Mehrzeichen-Operator"       "ungültige Zeichen"                           1 ++ 2
+assert_fail "Leerer Operator"            "ungültige Zeichen"                           1 "" 2
+assert_fail "Unbekannter Operator"       "ungültige Zeichen"                           1 a 2
 assert_fail "Falsche Argumentanzahl"     "Verwendung:"                                  10 +
-assert_fail "NaN-Eingabe abgelehnt"      "ist keine gültige Zahl"                      nan + 1
+assert_fail "NaN-Eingabe abgelehnt"      "ungültige Zeichen"                           nan + 1
 assert_fail "Sehr große Zahl (Overflow)" "ist keine gültige Zahl"                      1e500 + 0
 assert_fail "Ergebnis-Overflow"          "Ergebnis ist zu groß"                        1e300 '*' 1e300
 

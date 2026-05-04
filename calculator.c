@@ -4,6 +4,7 @@
 #include <math.h>
 #include <stdbool.h>
 #include <string.h>
+#include <ctype.h>
 
 /*
  * Calculator CLI
@@ -137,6 +138,33 @@ static bool parse_number(const char *input, double *result) {
     return true;
 }
 
+#define INPUT_MAX 32
+
+static bool valid_number_chars(const char *s) {
+    size_t n = strlen(s);
+    if (n == 0 || n > INPUT_MAX)
+        return false;
+    for (size_t i = 0; i < n; i++) {
+        unsigned char c = (unsigned char)s[i];
+        if (isdigit(c) || c == '.')
+            continue;
+        if ((c == '+' || c == '-') && (i == 0 || s[i-1] == 'e' || s[i-1] == 'E'))
+            continue;
+        if ((c == 'e' || c == 'E') && i > 0 && isdigit((unsigned char)s[i-1]))
+            continue;
+        return false;
+    }
+    return true;
+}
+
+static bool validate_args(const char *a, const char *op, const char *b) {
+    if (!valid_number_chars(a) || !valid_number_chars(b))
+        return false;
+    if (strlen(op) != 1 || strchr("+-*/", op[0]) == NULL)
+        return false;
+    return true;
+}
+
 /*
  * Entry point: parses three CLI arguments (number, operator, number),
  * validates them, calls calculate(), and prints the result to stdout.
@@ -156,6 +184,11 @@ int main(int argc, char *argv[]) {
     if (argc != 4) {
         fprintf(stderr, "Verwendung: %s <zahl> <operator> <zahl>\n", prog);
         fprintf(stderr, "Beispiel: %s 10 + 5\n", prog);
+        return 1;
+    }
+
+    if (!validate_args(argv[1], argv[2], argv[3])) {
+        fprintf(stderr, "Fehler: Eingabe enthält ungültige Zeichen\n");
         return 1;
     }
 
