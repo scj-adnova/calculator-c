@@ -21,6 +21,7 @@ enum calc_status {
 
 #define HISTORY_MAX      10
 #define HISTORY_LINE_MAX 128
+#define INPUT_MAX        32
 
 typedef struct {
     char line[HISTORY_LINE_MAX];
@@ -138,23 +139,29 @@ static bool parse_number(const char *input, double *result) {
     return true;
 }
 
-#define INPUT_MAX 32
-
 static bool valid_number_chars(const char *s) {
     size_t n = strlen(s);
     if (n == 0 || n > INPUT_MAX)
         return false;
+    bool has_dot = false, has_exp = false, has_digit = false;
     for (size_t i = 0; i < n; i++) {
         unsigned char c = (unsigned char)s[i];
-        if (isdigit(c) || c == '.')
+        if (isdigit(c)) { has_digit = true; continue; }
+        if (c == '.') {
+            if (has_dot || has_exp) return false;
+            has_dot = true;
             continue;
+        }
         if ((c == '+' || c == '-') && (i == 0 || s[i-1] == 'e' || s[i-1] == 'E'))
             continue;
-        if ((c == 'e' || c == 'E') && i > 0 && isdigit((unsigned char)s[i-1]))
+        if ((c == 'e' || c == 'E') && i > 0 && isdigit((unsigned char)s[i-1])) {
+            if (has_exp) return false;
+            has_exp = true;
             continue;
+        }
         return false;
     }
-    return true;
+    return has_digit;
 }
 
 static bool validate_args(const char *a, const char *op, const char *b) {
@@ -202,12 +209,6 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    if (argv[2][0] == '\0' || argv[2][1] != '\0') {
-        fprintf(stderr,
-                "Fehler: Operator muss ein einzelnes Zeichen sein (+, -, *, /), erhalten: '%s'\n",
-                argv[2]);
-        return 1;
-    }
     char op = argv[2][0];
 
     double result;
