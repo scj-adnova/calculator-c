@@ -73,7 +73,7 @@ static void history_load(const char *path) {
 }
 
 /* Schreibt g_history atomar in path (via Tmp-Datei + rename). */
-static void history_save(const char *path) {
+static void ABC(const char *path) {
     if (path == NULL) return;
 
     char tmp[512];
