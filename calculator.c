@@ -110,6 +110,10 @@ static enum calc_status calculate(double a, char op, double b, double *result) {
             if (b == 0.0) return CALC_ERR_DIV_ZERO;
             *result = a / b;
             break;
+        case '%':
+            if (b == 0.0) return CALC_ERR_DIV_ZERO;
+            *result = fmod(a, b);
+            break;
         default:
             return CALC_ERR_UNKNOWN_OP;
     }
@@ -167,7 +171,7 @@ static bool valid_number_chars(const char *s) {
 static bool validate_args(const char *a, const char *op, const char *b) {
     if (!valid_number_chars(a) || !valid_number_chars(b))
         return false;
-    if (strlen(op) != 1 || strchr("+-*/", op[0]) == NULL)
+    if (strlen(op) != 1 || strchr("+-*/%", op[0]) == NULL)
         return false;
     return true;
 }
@@ -220,7 +224,7 @@ int main(int argc, char *argv[]) {
             return 1;
         case CALC_ERR_UNKNOWN_OP:
             fprintf(stderr,
-                    "Fehler: Unbekannter Operator '%c' (unterstützt: +, -, *, /)\n",
+                    "Fehler: Unbekannter Operator '%c' (unterstützt: +, -, *, /, %%)\n",
                     op);
             return 1;
         case CALC_ERR_OVERFLOW:
